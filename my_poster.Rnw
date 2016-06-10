@@ -73,38 +73,23 @@ library(reshape2)
 library(xtable)
 library(biogram)
 
-size_mod <- 4
-cool_theme <- theme(plot.background=element_rect(fill = "transparent",
-                                                 colour = "transparent"),
-                    panel.grid.major = element_line(colour="lightgrey", linetype = "dashed"),
-                    panel.background = element_rect(fill = "white",colour = "black"),
-                    legend.background = element_rect(fill="NA"),
-                    legend.position = "bottom",
-                    axis.text = element_text(size=12 + size_mod),
-                    axis.title.x = element_text(size=16 + size_mod, vjust = -1), 
-                    axis.title.y = element_text(size=16 + size_mod, vjust = 1),
-                    strip.text = element_text(size=17 + size_mod, face = "bold"),
-                    strip.background = element_rect(fill="lightsteelblue", colour = "black"),
-                    legend.text = element_text(size=13 + size_mod), 
-                    legend.title = element_text(size=17 + size_mod),
-                    plot.title = element_text(size=20 + size_mod))
 
 @
 
 
 \date{}
-\author{Micha\l{} Burdukiewicz\inst{1}, John Doe\inst{2} and Jane Doe\inst{3}\\
+\author{Micha\l{} Burdukiewicz\inst{1}, Piotr Sobczyk\inst{2}, Pawe\l{} Mackiewicz\inst{1} and Ma\l{}gorzata Kotulska\inst{3}\\
 \small{*michalburdukiewicz@gmail.com}}
 
 
 \institute{\small{\textsuperscript{1}University of Wroc\l{}aw, Department of Genomics 
 
-\textsuperscript{2}Wroc\l{}aw University of Something, Faculty of Something
+\textsuperscript{2}Wroc\l{}aw University of Science and Technology, Faculty of Pure and Applied Mathematics
 
-\textsuperscript{3}Wroc\l{}aw University of Something, Faculty of Something Else}
+\textsuperscript{3}Wroc\l{}aw University of Science and Technology, Department of Biomedical Engineering}
 }
 }
-\title{\huge biogram: a toolkit for biological n-gram analysis}
+\title{\huge AmyloGram: n-gram analysis and prediction of amyloids}
 
 \begin{frame}
 \begin{columns}
@@ -114,49 +99,28 @@ cool_theme <- theme(plot.background=element_rect(fill = "transparent",
 \parbox[t][\columnheight]{\textwidth}
 {
 \begin{block}{Introduction}
-\lipsum[1]
+
 
     \end{block}
 
 
-\begin{block}{Tables in R}
+\begin{block}{Reduced amino acid alphabet}
 
-\small{
-       \begin{columns}[c] % the "c" option specifies center vertical alignment
-    \column{.5\textwidth} 
-<<echo = FALSE,message=FALSE,results='asis'>>=
-sample_seq <- matrix(sample(c("A", "C", "G", "T"), 18, replace = TRUE), nrow = 3)
-colnames(sample_seq) <- paste0("P", 1L:ncol(sample_seq))
-rownames(sample_seq) <- paste0("S", 1L:nrow(sample_seq))
-rws <- seq(1, nrow(sample_seq) - 1, by = 2)
-col <- rep("\\rowcolor{white}", length(rws))
+The amyloidogenicity of a given peptide may not depend on the exact sequence of 
+amino acids but on its more general properties. We 
+handpicked 17 measures from AAIndex data base 
+describing features important in the amyloidogenicity, such as: size of 
+residues, hydrophobicity, solvent surface area, frequency in $\beta$-sheets and 
+contactivity. 
 
-print(xtable(data.frame(sample_seq), caption = "Sample sequences.  S - sequence, P - postion.", digits = 0),
-      booktabs = TRUE, add.to.row = list(pos = as.list(rws), command = col))
+\bigskip
 
-# unis <- count_ngrams(sample_seq, 1, 1L:4, pos = TRUE)
-# unis <- data.frame(as.matrix(unis))[, 1L:7]
-# print(xtable(unis, caption = "A fraction of possible unigrams with position information.", digits = 0), include.rownames = FALSE)
-@
-      
-      
-     % column designated by a command
+  Based on that, we created 524,284 amino acid encodings with different level of 
+amino acid alphabet reduction from three to six amino acid groups using Ward's 
+clusterization ~\citep{joe_h._ward_jr_hierarchical_1963},  which was performed 
+on all combinations of the normalized values of physicochemical properties from 
+1 to 17.
 
-    \column{.5\textwidth}
-    
-<<echo = FALSE,message=FALSE,results='asis'>>=
-    
-     unis <- count_ngrams(sample_seq, 1, c("A", "C", "G", "T"))
-unis <- data.frame(as.matrix(unis))
-colnames(unis) <- c("A", "C", "G", "T")
-rownames(unis) <- paste0("S", 1L:nrow(sample_seq))
-print(xtable(unis, caption = "Unigram counts.", digits = 0), include.rownames = TRUE,
-      booktabs = TRUE, add.to.row = list(pos = as.list(rws), command = col))
-@
-
-    \end{columns}
-
-}    
     \end{block}
 
 
@@ -197,17 +161,15 @@ ggplot(dat, aes(x = n, y = n_max, fill = L, col = L)) +
     \end{block}
     \vfill
     
-    \begin{block}{Reducing number of n-grams}
+    \begin{block}{Extraction of n-grams}
     \begin{figure}
     \centering
     \includegraphics[width=0.5\columnwidth]{static_figure/example.png} 
     \end{figure}
 
-A) Input data: peptides with a known status (e.g. amyloid/nonamyloid). 
-
-B) Creation of an encoding using a combination of physicochemical properties (PP). 
-
-C) Reduction of the amino acid alphabet according to an encoding. The number of possible n-grams is reduced, because $m$ is smaller (e.g. in this case $m$ is reduced from 20 to 6).
+We extracted overlapping hexamers from all peptide 
+sequences. Each hexamer was tagged with the same etiquette: amyloid (positive) 
+or nonamyloid (negative) as the source peptide
       
     \end{block}
     \vfill
@@ -226,69 +188,37 @@ C) Reduction of the amino acid alphabet according to an encoding. The number of 
 \parbox[t][\columnheight]{\textwidth}
 {
 
-\begin{block}{signalHsmm -  prediction of signal peptides}
-Signal peptides are n-terminal guiding sequences with three distinguishable regions: n-, h- and c-region. Using the n-gram approach we created \textit{signalHsmm}, a software for prediction of signal peptides.
+\begin{block}{Informative n-grams}
+<<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=20,warning=FALSE>>=
+ngram_freq <- read.csv("ngram_freq.csv")
 
-\medskip
+ngram_freq_plot <- mutate(ngram_freq, decoded_name = gsub("_", "|", decoded_name)) %>%
+  mutate(decoded_name = factor(decoded_name, levels = as.character(decoded_name)),
+         amyloid = diff_freq > 0) %>%
+  melt() %>%
+  filter(variable %in% c("pos", "neg")) %>%
+  droplevels %>%
+  mutate(variable = factor(variable, labels = c("Amyloid", "Non-amyloid")))
 
-    \textit{signalHsmm} has two models representing respectively proteins with and without signal peptides. The probabilities of both fits and predicted cleavage site constitute the software output.    
-    \begin{figure}
-    \centering
-    \resizebox{32.5cm}{!}{%
-    \begin{tikzpicture}[->,>=stealth',shorten >=2pt,auto,node distance=9.5cm, thick]
-      \tikzstyle{line} = [draw=black, color=blue!30!black!50, line width=4.5mm, -latex']
-      \tikzstyle{main node} = [circle,fill=blue!20,draw, minimum size = 2.2cm, font=\itshape,
-         align=center,  top color=white, bottom color=blue!50!black!70 ] %font=\sffamily\small\bfseries,
-      %nodes
-      \node[main node]          	(start') 	[]						{Start};	     
-      \node[main node, bottom color=purple!70!black!70] 	(nregion') 	[right of=start',xshift=-5mm, yshift=15mm] 	{n-region};
-      \node[main node, bottom color=pink!70!black!70] 	(hregion') 	[right of=nregion',xshift=-5mm,yshift=15mm] 	{h-region};
-      \node[main node, bottom color=gray!70!black!70] 	(cregion') 	[right of=hregion',xshift=-5mm,yshift=-15mm] 	{c-region};
-      \node[main node, bottom color=green!70!black!70] 	(mature') 	[right of=cregion',xshift=-5mm, yshift=-15mm] 	{Mature protein};
-      
-      %lines
-      \path [line] (start')   edge node [left, color=black] {} (nregion');
-      \path [line] (nregion') edge node [below, color=black] { } (hregion');
-      \path [line] (hregion') edge node [below, color=black] { } (cregion');
-      \path [line] (cregion') edge node [left, color=black] { } (mature');
-      \draw [line] (start') to[out=340,in=200] (mature');
-    \end{tikzpicture} }
-    \end{figure}
+ggplot(ngram_freq_plot, aes(x = decoded_name, y = value)) +
+  geom_bar(aes(fill = variable), position = "dodge", stat = "identity") +
+  geom_point(data = group_by(ngram_freq_plot, decoded_name)  %>% filter(value == max(value)),
+             aes(y = value + 0.002, shape = association), size = 6) +
+  scale_fill_manual("", values = c("gold", "darkmagenta")) +
+  scale_shape_manual("Motif:", breaks = c("Amyloidogenic", "Non-amyloidogenic"), values = c(16, 17, NA)) +
+  scale_y_continuous("Frequency") +
+  scale_x_discrete("") +
+  coord_flip() +
+  my_theme +
+  theme(panel.grid.major.y = element_line(color = "lightgrey", size = 0.5)) 
 
-
-    \end{block}
-    \vfill   
-
-\begin{block}{signalHsmm benchmark}
-\begin{table}[ht]
-\centering
-
-\begin{tabular}{rllll}
-  \toprule
- & Sensitivity & Specificity & MCC & AUC \\ 
-  \midrule
-signalP 4.1 (no tm) \citep{2011petersensignalp} & 0.8235 & \textbf{0.9100} & 0.6872 & 0.8667 \\ 
-   \rowcolor{white}signalP 4.1 (tm) \citep{2011petersensignalp} & 0.6471 & 0.9431 & 0.6196 & 0.7951 \\
-   signalHsmm & \textbf{0.9804} & 0.8720 & \textbf{0.7409} & \textbf{0.9262} \\ 
-   \rowcolor{white}signalHsmm (raw aa) & 0.8431 & 0.9005 & 0.6853 & 0.8718 \\ 
-   \bottomrule
-\end{tabular}
-\end{table}
-
-Comparison of performance measures for different classifiers according to singal peptide-containing proteins from members of \textit{Plasmodiidae}. 
-
-\medskip
-
-Thanks to the usage of reduced amino acid alphabet, \textit{signalHsmm} better recognizes signal peptides belonging to \textit{Plasmodiidae} which are characterized by an atypical amino acid composition.
-
-
+@
 \end{block}
 \vfill
 
-\begin{block}{AmyloGram}
-Amyloids are proteins associated with the number of clinical disorders (e.g., Alzheimer's, Creutzfeldt-Jakob?s and Huntington?s diseases). We created \textit{AmyloGram}, n-based predictor of amyloidogenicity using decision rules extracted by random forests.
 
-\medskip
+
+\begin{block}{Benchmark results}
 
 \begin{table}[ht]
 \centering
@@ -311,23 +241,15 @@ AmyloGram & \textbf{0.8972} & \textbf{0.6307} & 0.8658 & 0.7889 \\
 
 
 \begin{block}{Summary and funding}
-The n-gram analysis creates versatile classifiers able to extract more universal decision rules (e.g. \textit{signalHsmm}, which is able to also predict signal peptides in atypical organisms) or better detect specific proteins. Nonetheless, despite computational quickness provided by the QuiPT method, curse of dimensionality limits n-gram methods to the analysis of shorter sequences.
+words, words, words
 
 \bigskip
 
-Our software is avaible as web-servers:
-
-\begin{enumerate}
-
-\item \textit{signalHsmm} web-server: \url{smorfland.uni.wroc.pl/signalHsmm}.
-
-\item \textit{AmyloGram} web-server: \url{smorfland.uni.wroc.pl/amylogram}.
-
-\end{enumerate}
+Our software is avaible as a web-server: \url{smorfland.uni.wroc.pl/amylogram}.
 
 \bigskip
 
-This research was partially funded by the KNOW Consortium and National Science Center (2015/17/N/NZ2/01845).
+\small{This research was partially funded by the KNOW Consortium and National Science Center (2015/17/N/NZ2/01845).}
 
 \end{block}
 \vfill

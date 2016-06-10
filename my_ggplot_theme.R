@@ -3,7 +3,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-size_mod <- 3
+size_mod <- 4
 
 my_theme <- theme(
   axis.text = element_text(size=13 + size_mod),
@@ -22,7 +22,7 @@ my_theme <- theme(
   panel.grid.major = element_line(color="white", linetype = "dashed", size = 0.5),
   panel.grid.major = element_line(color="lightgrey", 
                                   linetype = "dashed", size = 0.5),
-  panel.background = element_rect(fill = "transparent", color = "black"),
+  panel.background = element_rect(fill = "white",colour = "black"),
   
   plot.background=element_rect(fill = "transparent",
                                color = "transparent"),
