@@ -10,9 +10,6 @@
 \usepackage{array,booktabs,tabularx}
 \usepackage{epstopdf}
 \usepackage{colortbl, xcolor}
-% consider commenting me out ----------------------------------------------------
-\usepackage{lipsum}
-% -------------------------------------------------------------------------------
 \newcolumntype{Z}{>{\centering\arraybackslash}X}
 
 % rysunki
@@ -100,6 +97,7 @@ library(biogram)
 {
 \begin{block}{Introduction}
 
+Amyloids are proteins associated with the number of clinical disorders (e.g., Alzheimer's, Creutzfeldt-Jakob’s and Huntington’s diseases). Despite their diversity, all amyloid proteins can undergo aggregation initiated by 6- to \mbox{15-residue} segments called hot spots.
 
     \end{block}
 
@@ -124,55 +122,6 @@ on all combinations of the normalized values of physicochemical properties from
     \end{block}
 
 
-\begin{block}{Equation}
-    
-
-\begin{center}
-\scalebox{0.85}{
-$
-n_{\text{max}} = L \times m^n
-$
-}
-\end{center}
-
-\end{block}
-
-
-\begin{block}{R plot}
-
-<<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=6>>=
-library(reshape2)
-n <- 1:6
-n_max <- 4^n
-
-dat <- melt(sapply(2:5*5, function(i) i * n_max))
-dat[["Var2"]] <- factor(dat[["Var2"]])
-levels(dat[["Var2"]]) <- 2:5*5
-colnames(dat) <- c("n", "L", "n_max")
-ggplot(dat, aes(x = n, y = n_max, fill = L, col = L)) + 
-  geom_line(linetype="dotted", size=1.5) + 
-  geom_point(size=7, shape=21) +
-  scale_x_continuous(breaks = 0L:6) +
-  scale_y_continuous(expression(n["max"])) +
-  my_theme
-
-@
-
-    \end{block}
-    \vfill
-    
-    \begin{block}{Extraction of n-grams}
-    \begin{figure}
-    \centering
-    \includegraphics[width=0.5\columnwidth]{static_figure/example.png} 
-    \end{figure}
-
-We extracted overlapping hexamers from all peptide 
-sequences. Each hexamer was tagged with the same etiquette: amyloid (positive) 
-or nonamyloid (negative) as the source peptide
-      
-    \end{block}
-    \vfill
 
 }
 \end{minipage}
