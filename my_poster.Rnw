@@ -97,7 +97,14 @@ library(biogram)
 {
 \begin{block}{Introduction}
 
-Amyloids are proteins associated with the number of clinical disorders (e.g., Alzheimer's, Creutzfeldt-Jakob’s and Huntington’s diseases). Despite their diversity, all amyloid proteins can undergo aggregation initiated by 6- to \mbox{15-residue} segments called hot spots.
+Amyloids are proteins associated with the number of clinical disorders (e.g., Alzheimer's, Creutzfeldt-Jakob's and Huntington's diseases). Despite their diversity, all amyloid proteins can undergo aggregation initiated by 6- to \mbox{15-residue} segments called hot spots. To find the patterns defining the hot-spots, we trained predictors of amyloidogenicity based on random forests using short subsequences (n-grams) extracted from amyloidogenic and non-amyloidogenic peptides collected in the AmyLoad database.
+
+    \end{block}
+
+\begin{block}{Scheme}
+\begin{figure} 
+\includegraphics[width=0.85\columnwidth]{static_figure/ngram_scheme_poster.eps}
+\end{figure}
 
     \end{block}
 
@@ -121,6 +128,31 @@ on all combinations of the normalized values of physicochemical properties from
 
     \end{block}
 
+\begin{block}{Quick Permutation Test (QuiPT)}
+    Model and statistic independent permutation tests can be used to filter features obtained through counting n-grams.
+    
+    During a permutation test class labels are randomly exchanged during computation of a significance statistic. p-values are defined as:
+    
+\begin{center}
+\scalebox{0.85}{
+$      
+\textnormal{p-value} = \frac{N_{T_P > T_R}}{N}
+$
+}
+\end{center}
+
+where $N_{T_P > T_R}$ is number of times when $T_P$ (permuted test statistic) was more extreme than $T_R$ (test statistic for non-permuted data).
+
+Permutation tests are computationally expensive (especially considering precise estimation of small p-values, because the number of permutations is inversely proportional to the interval between p-values).
+
+\medskip
+
+\textbf{Qui}ck \textbf{P}ermutation \textbf{T}est (QuiPT) thanks to the unique parameterization replaces a permutation test with the exact two-sided Fisher's test~\citep{lehmann1986testing} reducing the computation cost. 
+      
+    \end{block}
+    \vfill
+
+
 
 
 }
@@ -138,30 +170,40 @@ on all combinations of the normalized values of physicochemical properties from
 {
 
 \begin{block}{Informative n-grams}
-<<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=20,warning=FALSE>>=
+<<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=6,warning=FALSE>>=
 ngram_freq <- read.csv("ngram_freq.csv")
 
 ngram_freq_plot <- mutate(ngram_freq, decoded_name = gsub("_", "|", decoded_name)) %>%
   mutate(decoded_name = factor(decoded_name, levels = as.character(decoded_name)),
          amyloid = diff_freq > 0) %>%
   melt() %>%
-  filter(variable %in% c("pos", "neg")) %>%
+  filter(variable %in% c("pos", "neg"),
+         association != "Not found") %>%
   droplevels %>%
   mutate(variable = factor(variable, labels = c("Amyloid", "Non-amyloid")))
 
 ggplot(ngram_freq_plot, aes(x = decoded_name, y = value)) +
   geom_bar(aes(fill = variable), position = "dodge", stat = "identity") +
   geom_point(data = group_by(ngram_freq_plot, decoded_name)  %>% filter(value == max(value)),
-             aes(y = value + 0.002, shape = association), size = 6) +
+             aes(y = value + 0.004, shape = association), size = 6) +
   scale_fill_manual("", values = c("gold", "darkmagenta")) +
   scale_shape_manual("Motif:", breaks = c("Amyloidogenic", "Non-amyloidogenic"), values = c(16, 17, NA)) +
   scale_y_continuous("Frequency") +
   scale_x_discrete("") +
-  coord_flip() +
   my_theme +
   theme(panel.grid.major.y = element_line(color = "lightgrey", size = 0.5)) 
 
 @
+
+The frequency of important n-grams used by the best-performing 
+classifier in amyloid and non-amyloid sequences. The elements of n-grams are 
+amino acids encoded using the best-performing reduced amino acid alphabet. 
+A vertical bar represents a gap in a n-gram between 
+its elements. The frequency was computed using the total number of occurrences 
+divided by the number of possible n-grams of their length. Dots and triangles 
+denote n-grams occurring in motifs found in respectively amyloidogenic and 
+non-amyloidogenic sequences~\citep{paz_sequence_2004}.
+
 \end{block}
 \vfill
 
@@ -183,6 +225,8 @@ AmyloGram & \textbf{0.8972} & \textbf{0.6307} & 0.8658 & 0.7889 \\
    \bottomrule
 \end{tabular}
 \end{table}
+
+The predictor based on the best-performing alphabet, called AmyloGram, was benchmarked against the most popular tools for the detection of amyloid peptides using an external data set \textit{pep424}.
 
 \end{block}
 \vfill
