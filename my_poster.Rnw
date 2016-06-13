@@ -169,6 +169,54 @@ Permutation tests are computationally expensive (especially considering precise 
 \parbox[t][\columnheight]{\textwidth}
 {
 
+
+\begin{block}{Results of cross-validation}
+
+Distribution of mean AUC values of classifiers with various encodings 
+for every possible combination of training and testing data set including 
+different lengths of sequences. 
+
+<<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=6,warning=FALSE>>=
+amyloids_plot <- read.csv("amyloid_plot_data.csv")
+
+ggplot(amyloids_plot, aes(x = len_range, y = AUC_mean)) +
+  geom_boxplot(outlier.color = "grey", outlier.shape = 1) +
+  geom_point(data = filter(amyloids_plot, et != "Encoding"), 
+             aes(x = len_range, y = AUC_mean, color = et, shape = et), size = 4) +
+  scale_x_discrete("") +
+  scale_y_continuous("Mean AUC") +
+  scale_shape_manual("", values = c(16, 1, 15, 15), drop = FALSE) +
+  scale_color_manual("", values = c("red", "grey", "green", "blue"), drop = FALSE) +
+  facet_wrap(~ pos, nrow = 3) +
+  my_theme + 
+  coord_flip()
+@
+
+\tiny
+The left and right hinges of boxes correspond to 
+the 0.25 and 0.75 quartiles. The bar inside the box represents the median. The 
+gray circles correspond to the encodings with the AUC outside the 0.95 
+confidence interval.
+
+\normalsize	
+\bigskip
+The predictor based on the best-performing encoding reached the highest AUC (0.8667) 
+in classification of the shortest sequences (with the length of 6 residues).
+
+\bigskip
+
+Classifiers based on the full (i.e., unreduced) amino acid alphabet never predicted 
+amyloidogenicity better than the best classifier based on the reduced alphabet. 
+
+\bigskip
+
+The standard encodings found in the literature performed worse than other 
+analyzed encodings in most categories.
+
+\end{block}
+\vfill
+
+
 \begin{block}{Informative n-grams}
 <<echo = FALSE,message=FALSE,fig.align='center',fig.width=14,fig.height=6,warning=FALSE>>=
 ngram_freq <- read.csv("ngram_freq.csv")
@@ -199,8 +247,7 @@ The frequency of important n-grams used by the best-performing
 classifier in amyloid and non-amyloid sequences. The elements of n-grams are 
 amino acids encoded using the best-performing reduced amino acid alphabet. 
 A vertical bar represents a gap in a n-gram between 
-its elements. The frequency was computed using the total number of occurrences 
-divided by the number of possible n-grams of their length. Dots and triangles 
+its elements. Dots and triangles 
 denote n-grams occurring in motifs found in respectively amyloidogenic and 
 non-amyloidogenic sequences~\citep{paz_sequence_2004}.
 
@@ -234,7 +281,9 @@ The predictor based on the best-performing alphabet, called AmyloGram, was bench
 
 
 \begin{block}{Summary and funding}
-words, words, words
+Thanks to the reduction of the amino acid alphabet and description of peptides by 
+short sub-sequences (n-grams), we were able to create the efficient predictor 
+of amyloidogenic sequences called AmyloGram.
 
 \bigskip
 
