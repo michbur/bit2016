@@ -101,7 +101,7 @@ Amyloids are proteins associated with the number of clinical disorders (e.g., Al
 
     \end{block}
 
-\begin{block}{Scheme}
+\begin{block}{Training of AmyloGram}
 \begin{figure} 
 \includegraphics[width=0.85\columnwidth]{static_figure/ngram_scheme_poster.eps}
 \end{figure}
